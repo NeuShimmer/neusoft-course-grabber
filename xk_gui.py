@@ -17,8 +17,8 @@ from Crypto.Util.Padding import pad
 
 PREFS_FILE = "xk_gui_prefs.json"
 DEFAULT_XK_HOST = "https://xk.neusoft.edu.cn"
-DEFAULT_OPENAI_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-DEFAULT_OPENAI_MODEL = "qwen-vl-ocr"
+DEFAULT_OPENAI_BASE_URL = ""
+DEFAULT_OPENAI_MODEL = ""
 DEFAULT_RETRY_TIMES = 3
 DEFAULT_TEACHING_CLASS_TYPE = "XGKC"
 DEFAULT_PAGE_SIZE = 100
