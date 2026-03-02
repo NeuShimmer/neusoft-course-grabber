@@ -531,19 +531,40 @@ class XKGuiApp:
         self.status_var = tk.StringVar(value="请先输入学号和密码")
         ttk.Label(self.root, textvariable=self.status_var, foreground="#1f4e79").pack(fill=tk.X, padx=10)
 
-        columns = ("KCM", "KXH", "SKJS", "teachingPlace", "SFKT")
+        columns = (
+            "KCH",
+            "KCM",
+            "KXH",
+            "SKJS",
+            "XF",
+            "XGXKLB",
+            "classCapacity",
+            "numberOfSelected",
+            "teachingPlace",
+            "SFKT",
+        )
         self.tree = ttk.Treeview(self.root, columns=columns, show="headings", height=26, selectmode="extended")
         headers = {
+            "KCH": "课程号",
             "KCM": "课程名",
             "KXH": "课序号",
             "SKJS": "教师",
+            "XF": "学分",
+            "XGXKLB": "通识选修课类别",
+            "classCapacity": "课容量",
+            "numberOfSelected": "已选人数",
             "teachingPlace": "上课时间地点",
             "SFKT": "可选(1是0否)",
         }
         widths = {
+            "KCH": 130,
             "KCM": 220,
             "KXH": 80,
             "SKJS": 140,
+            "XF": 70,
+            "XGXKLB": 140,
+            "classCapacity": 90,
+            "numberOfSelected": 90,
             "teachingPlace": 560,
             "SFKT": 120,
         }
@@ -552,10 +573,12 @@ class XKGuiApp:
             self.tree.column(col, width=widths[col], anchor=tk.W)
 
         yscroll = ttk.Scrollbar(self.root, orient=tk.VERTICAL, command=self.tree.yview)
-        self.tree.configure(yscrollcommand=yscroll.set)
+        xscroll = ttk.Scrollbar(self.root, orient=tk.HORIZONTAL, command=self.tree.xview)
+        self.tree.configure(yscrollcommand=yscroll.set, xscrollcommand=xscroll.set)
 
-        self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(10, 0), pady=10)
+        self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(10, 0), pady=(10, 0))
         yscroll.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
+        xscroll.pack(side=tk.BOTTOM, fill=tk.X, padx=(10, 10), pady=(0, 10))
 
     def _pick_batch_id(self, batch_list: List[Dict[str, Any]]) -> str:
         if not batch_list:
@@ -601,9 +624,14 @@ class XKGuiApp:
                 "",
                 tk.END,
                 values=(
+                    row.get("KCH", ""),
                     row.get("KCM", ""),
                     row.get("KXH", ""),
                     row.get("SKJS", ""),
+                    row.get("XF", ""),
+                    row.get("XGXKLB", ""),
+                    row.get("classCapacity", row.get("KRL", "")),
+                    row.get("numberOfSelected", row.get("YXRS", "")),
                     _get_teaching_place(row),
                     _selectable_flag(row),
                 ),
@@ -696,7 +724,10 @@ class XKGuiApp:
                 messagebox.showerror("输入错误", "AI识别模式下 Model 不能为空")
                 return
 
-        base_host = DEFAULT_XK_HOST
+        base_host = (str(self.prefs.get("xk_host") or os.getenv("XK_HOST") or DEFAULT_XK_HOST)).strip().rstrip("/")
+        if not re.match(r"^https?://", base_host, re.IGNORECASE):
+            messagebox.showerror("参数错误", "选课系统地址必须以 http:// 或 https:// 开头")
+            return
         base_api = f"{base_host}/xsxk"
         base_profile = f"{base_api}/profile"
         retry_times = DEFAULT_RETRY_TIMES
