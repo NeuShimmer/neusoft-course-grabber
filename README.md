@@ -1,4 +1,4 @@
-# DNUI 金智教务选课工具（源码）
+# DNUI 金智教务选课工具
 
 基于 `Python + requests + tkinter` 的源码项目，用于登录、课程查询与选课操作。
 
